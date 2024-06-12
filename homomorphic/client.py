@@ -2,9 +2,6 @@ import socket
 import sys
 import time
 
-host = '0.0.0.0'
-port = 12345
-
 def recvall(s):
     ret = b''
     s.settimeout(0.1)
@@ -20,7 +17,7 @@ if __name__ == '__main__':
         print('Usage: python client.py [server-port]')
         sys.exit(1)
 
-    host = '0.0.0.0'
+    host = '127.0.0.1'
     port = 12345 if len(sys.argv)==1 else int(sys.argv[1])
 
     # socket configuration - server
