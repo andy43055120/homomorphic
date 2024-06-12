@@ -2,6 +2,18 @@ import socket
 import sys
 import json
 import time
+import ast
+
+def save_dataset(s):
+    with open('dataset.txt', 'wb') as f:
+        f.write(s.recv(1024))
+        s.settimeout(0.1)
+        while True:
+            try:
+                f.write(s.recv(1024).decode('utf-8'))
+            except:
+                s.settimeout(None)
+                return
 
 def get_model_args(conn):
     model_id = 0
@@ -22,8 +34,11 @@ def get_model_args(conn):
         for i, param in enumerate(models['models'][model_id]['params']):
             conn.send(f"Enter value for parameter {param}: [{models['models'][model_id]['params'][param]}]".encode('utf-8'))
             param_value = conn.recv(1024).decode('utf-8').strip()
-            param_value = param_value if param_value != 'default_opt' else models['models'][model_id]['params'][param]
-            param_value = int(param_value) if param_value.isdigit() else param_value
+            if param_value != 'default_opt':
+                param_value = ast.literal_eval(param_value)
+            else:
+                param_value = models['models'][model_id]['params'][param]
+
             args.append(param_value)
             
     return args
@@ -36,7 +51,13 @@ def handle_train(conn):
     # query for model type and hyper-parameters
     model_args = get_model_args(conn)
 
+    time.sleep(0.5) # let client know that the server is ready to receive the dataset
+
     try:
+        conn.send(b'please input the path to the dataset: ')
+        save_dataset(conn)
+
+        # dataset is now saved in dataset.txt
         # TODO: code for training here
         # model_args saves the hyper-parameters for the model
         # save the trained model parameters to a file

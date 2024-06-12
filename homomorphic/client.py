@@ -31,6 +31,7 @@ if __name__ == '__main__':
 
         # train model
         if cmd == '1':
+            # decide to use which model and set parameters
             while True:
                 msg = recvall(s).decode('utf-8').strip()
                 if len(msg) == 0:
@@ -40,7 +41,17 @@ if __name__ == '__main__':
                 inp = inp if inp else 'default_opt'
                 s.send(inp.encode('utf-8'))
 
-            # TODO: decide to use which model and send encryrpted dataset
+            time.sleep(0.5)
+            print(recvall(s).decode('utf-8').strip())
+            while True:
+                try:
+                    path = input()
+                    with open(path, 'rb') as f:
+                        # TODO: encrypt dataset here
+                        s.sendfile(f)
+                        break
+                except:
+                    print('Invalid path, please try again')
 
             success = s.recv(1024).decode('utf-8')
             if success == '1': # successful
