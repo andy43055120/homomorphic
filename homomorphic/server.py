@@ -4,13 +4,13 @@ import json
 import time
 import ast
 
-def save_dataset(s):
-    with open('dataset.txt', 'wb') as f:
+def save_dataset(s, filename):
+    with open(filename, 'wb') as f:
         f.write(s.recv(1024))
         s.settimeout(0.1)
         while True:
             try:
-                f.write(s.recv(1024).decode('utf-8'))
+                f.write(s.recv(1024))
             except:
                 s.settimeout(None)
                 return
@@ -54,8 +54,10 @@ def handle_train(conn):
     time.sleep(0.5) # let client know that the server is ready to receive the dataset
 
     try:
-        conn.send(b'please input the path to the dataset: ')
-        save_dataset(conn)
+        conn.send(b'please input the path to the dataset (x_train): ')
+        save_dataset(conn, 'x_train.csv')
+        conn.send(b'please input the path to the dataset (y_train): ')
+        save_dataset(conn, 'y_train.csv')
 
         # dataset is now saved in dataset.txt
         # TODO: code for training here
